@@ -7,22 +7,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          submodules: recursive
+          submodules: false
 
-      - name: set up JDK 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Build with Gradle
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon || ./gradlew assembleDebug --no-daemon
-          
+        run: ./gradlew assembleDebug --no-daemon
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: WND-EMU-APK
-          path: "**/*.apk"
+          path: app/build/outputs/apk/debug/*.apk
