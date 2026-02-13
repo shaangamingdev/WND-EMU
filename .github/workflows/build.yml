@@ -1,29 +1,28 @@
-name: Build APK
+name: WND-EMU Build
 on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Get Source Code
         uses: actions/checkout@v4
         with:
-          submodules: false
-          persist-credentials: false
+          submodules: false 
 
-      - name: Set up JDK 17
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Make Gradlew Executable
+      - name: Give Permission
         run: chmod +x gradlew
 
-      - name: Build APK (Ignore Errors)
-        run: ./gradlew assembleDebug --no-daemon || echo "Attempting force build..."
+      - name: Build WND-EMU APK
+        run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload Result
+      - name: Download Your APK
         uses: actions/upload-artifact@v4
         with:
-          name: WND-EMU-APK
-          path: "**/build/outputs/apk/debug/*.apk"
+          name: WND-EMU-Final-App
+          path: app/build/outputs/apk/debug/*.apk
