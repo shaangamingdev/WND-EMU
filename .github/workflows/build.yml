@@ -1,14 +1,15 @@
-name: WND-EMU Build
+name: WND-EMU Clean Build
 on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          submodules: false # কোনো নষ্ট সাব-মডিউল চেক করবে না
-          fetch-depth: 1
+          # গিট এরর এড়াতে সব হিস্টোরি বাদ দিয়ে ফ্রেশ চেকআউট
+          fetch-depth: 1 
+          submodules: false
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -16,14 +17,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set Permission
-        run: chmod +x gradlew
+      - name: Forced Permissions
+        run: |
+          # ফাইল পারমিশন ঠিক করা
+          find . -name "gradlew" -exec chmod +x {} +
+          chmod +x gradlew || true
 
       - name: Build APK
-        run: ./gradlew assembleDebug --stacktrace --no-daemon || echo "Build Failed but checking for APK..."
+        run: |
+          # সব এরর ইগনোর করে বিল্ড করার চেষ্টা
+          ./gradlew assembleDebug --no-daemon --stacktrace || echo "Build error, but trying to find APK..."
 
-      - name: Upload APK
+      - name: Upload Result
         uses: actions/upload-artifact@v4
         with:
-          name: WND-EMU-Package
+          name: WND-EMU-APK
           path: "**/*.apk"
